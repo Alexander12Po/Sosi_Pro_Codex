@@ -61,7 +61,7 @@ class handler(BaseHTTPRequestHandler):
             except Exception as e:
                 return self.reply({"error": "❌ Token inválido: " + str(e)}, 400)
             if p.endswith("create"):
-                nid = str(max([int(l["id"]) for l in links] + [0]) + 1)
+                nid = os.urandom(5).hex()
                 links.append({"id": nid, "botToken": tok, "chatId": chat,
                               "botName": name, "status": "active"})
             else:
