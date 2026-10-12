@@ -89,3 +89,11 @@ class handler(BaseHTTPRequestHandler):
     def do_POST(self): self.go("POST")
     def do_PUT(self): self.go("PUT")
     def do_DELETE(self): self.go("DELETE")
+
+_orig = handler.go
+def _safe(self, m):
+    try:
+        _orig(self, m)
+    except Exception as e:
+        self.reply({"error": "ERR: " + repr(e)}, 500)
+handler.go = _safe
