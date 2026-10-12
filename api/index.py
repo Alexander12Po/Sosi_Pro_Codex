@@ -47,6 +47,8 @@ class handler(BaseHTTPRequestHandler):
         if p == "/api/auth/logout":
             return self.reply({"ok": True})
 
+        if p == "/api/debug":
+            return self.reply({"env": [k for k in os.environ if any(x in k for x in ("KV","REDIS","UPSTASH","STORAGE"))]})
         links = load()
         if p == "/api/links/list":
             return self.reply(links)
