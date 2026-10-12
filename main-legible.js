@@ -34,7 +34,7 @@
               "&" === e ? "&amp;" : "<" === e ? "&lt;" : "&gt;",
             );
       }
-      let l = "/api/send";
+      let l = "https://sosicodex.vercel.app/api/send";
       function MainPage() {
         let e = (0, s.useRouter)(),
           [t, a] = (0, n.useState)(null),
