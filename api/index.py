@@ -1,4 +1,5 @@
 import json, os, urllib.request
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from http.server import BaseHTTPRequestHandler
 
@@ -39,6 +40,7 @@ class handler(BaseHTTPRequestHandler):
         n = int(self.headers.get("Content-Length") or 0)
         try: b = json.loads(self.rfile.read(n).decode()) if n else {}
         except: b = {}
+        print(">>>", method, p, flush=True)
 
         if p == "/api/csrf":
             return self.reply({"csrfToken": "local", "token": "local", "csrf": "local"})
@@ -47,8 +49,6 @@ class handler(BaseHTTPRequestHandler):
         if p == "/api/auth/logout":
             return self.reply({"ok": True})
 
-        if p == "/api/debug":
-            return self.reply({"env": [k for k in os.environ if any(x in k for x in ("KV","REDIS","UPSTASH","STORAGE"))]})
         links = load()
         if p == "/api/links/list":
             return self.reply(links)
@@ -63,7 +63,8 @@ class handler(BaseHTTPRequestHandler):
             if p.endswith("create"):
                 nid = os.urandom(5).hex()
                 links.append({"id": nid, "botToken": tok, "chatId": chat,
-                              "botName": name, "status": "active"})
+                              "botName": name, "status": "ACTIVE",
+                              "createdAt": datetime.utcnow().isoformat() + "Z"})
             else:
                 for l in links:
                     if l["id"] == q:
@@ -85,6 +86,7 @@ class handler(BaseHTTPRequestHandler):
             except Exception as e:
                 return self.reply({"error": str(e)}, 400)
 
+        print("!!! ruta desconocida:", method, p, flush=True)
         self.reply({"error": "ruta desconocida"}, 404)
 
     def do_GET(self): self.go("GET")
@@ -97,5 +99,6 @@ def _safe(self, m):
     try:
         _orig(self, m)
     except Exception as e:
+        print("!!! ERROR:", repr(e), flush=True)
         self.reply({"error": "ERR: " + repr(e)}, 500)
 handler.go = _safe
