@@ -203,7 +203,7 @@
             }
           },
           deleteLink = async (e) => {
-            confirm("Delete?") &&
+            confirm("¿Eliminar?") &&
               (await fetch("/api/links/delete?id=".concat(e), {
                 method: "DELETE",
                 headers: { "X-CSRF-Token": r },
@@ -660,7 +660,7 @@
                               "☠️XRAHAT DEV☠️",
                               (0, i.jsx)("span", {
                                 className: "logo-sub",
-                                children: "CONTROL CENTER",
+                                children: "CENTRO DE CONTROL",
                               }),
                             ],
                           }),
@@ -672,12 +672,12 @@
                                 onClick: () => {
                                   (C(null), v(""), f(""), y(""), h(!0));
                                 },
-                                children: "+ NEW LINK",
+                                children: "+ NUEVO ENLACE",
                               }),
                               (0, i.jsx)("button", {
                                 className: "btn danger",
                                 onClick: handleLogout,
-                                children: "LOGOUT",
+                                children: "CERRAR SESIÓN",
                               }),
                             ],
                           }),
@@ -723,7 +723,7 @@
                                         }),
                                         (0, i.jsx)("span", {
                                           className: "status-text",
-                                          children: "ACTIVE",
+                                          children: "ACTIVO",
                                         }),
                                         (0, i.jsxs)("div", {
                                           className: "card-number",
@@ -741,7 +741,7 @@
                                           className: "info-block",
                                           children: [
                                             (0, i.jsx)("small", {
-                                              children: "BOT NAME",
+                                              children: "NOMBRE DEL BOT",
                                             }),
                                             (0, i.jsx)("h4", {
                                               children: escapeHtml(
@@ -754,7 +754,7 @@
                                           className: "info-block",
                                           children: [
                                             (0, i.jsx)("small", {
-                                              children: "CHAT ID",
+                                              children: "ID DEL CHAT",
                                             }),
                                             (0, i.jsx)("h4", {
                                               children: escapeHtml(e.chatId),
@@ -853,7 +853,7 @@
                             children: [
                               (0, i.jsx)("label", {
                                 className: "input-label",
-                                children: "CHAT ID",
+                                children: "ID DEL CHAT",
                               }),
                               (0, i.jsx)("input", {
                                 className: "input",
@@ -879,12 +879,12 @@
                                 className: "btn primary",
                                 onClick: handleSaveLink,
                                 disabled: b,
-                                children: b ? "Loading..." : "Save",
+                                children: b ? "Cargando..." : "Guardar",
                               }),
                               (0, i.jsx)("button", {
                                 className: "btn danger",
                                 onClick: () => h(!1),
-                                children: "Cancel",
+                                children: "Cancelar",
                               }),
                             ],
                           }),
