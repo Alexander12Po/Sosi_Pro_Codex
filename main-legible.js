@@ -657,7 +657,7 @@
                           (0, i.jsxs)("div", {
                             className: "logo",
                             children: [
-                              "☠️XRAHAT DEV☠️",
+                              "☠️XSOSIRAT COX☠️",
                               (0, i.jsx)("span", {
                                 className: "logo-sub",
                                 children: "CENTRO DE CONTROL",
