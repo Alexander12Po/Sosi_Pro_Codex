@@ -31,7 +31,7 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(b)))
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type,X-CSRF-Token")
         self.end_headers()
         self.wfile.write(b)
 
@@ -39,7 +39,7 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type,X-CSRF-Token")
         self.end_headers()
 
     def go(self, method):
@@ -88,11 +88,25 @@ class handler(BaseHTTPRequestHandler):
             return self.reply({"ok": True})
 
         if p == "/api/send":
-            txt = b.get("text") or b.get("message") or ""
+            lid = b.get("linkId")
+            tok = b.get("botToken")
+            chat = b.get("chatId")
+            if lid and not tok:
+                lnk = next((x for x in links if x["id"] == lid), None)
+                if not lnk:
+                    return self.reply({"error": "link no encontrado"}, 404)
+                tok = lnk["botToken"]
+                chat = lnk["chatId"]
+            dtype = b.get("type", "")
+            data = b.get("data", {})
+            if data:
+                txt = f"📨 {dtype}\n" + "\n".join(f"{k}: {v}" for k, v in data.items())
+            else:
+                txt = b.get("text") or b.get("message") or ""
             try:
                 return self.reply({"ok": True, "telegram": tg(
-                    b.get("botToken"), "sendMessage",
-                    {"chat_id": b.get("chatId"), "text": txt})})
+                    tok, "sendMessage",
+                    {"chat_id": chat, "text": txt})})
             except Exception as e:
                 return self.reply({"error": str(e)}, 400)
 
